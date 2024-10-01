@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ScheduleItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ScheduleItemRepository::class)]
 class ScheduleItem
@@ -18,8 +19,9 @@ class ScheduleItem
     #[ORM\JoinColumn(nullable: false)]
     private ?Subject $subject = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $dayOfWeek = null;
+    #[ORM\Column]
+    #[Assert\Range(min: 1, max: 7)]
+    private ?int $dayOfWeek = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     private ?\DateTimeInterface $startTime = null;
@@ -47,12 +49,12 @@ class ScheduleItem
         return $this;
     }
 
-    public function getDayOfWeek(): ?string
+    public function getDayOfWeek(): ?int
     {
         return $this->dayOfWeek;
     }
 
-    public function setDayOfWeek(string $dayOfWeek): static
+    public function setDayOfWeek(int $dayOfWeek): static
     {
         $this->dayOfWeek = $dayOfWeek;
 
