@@ -9,6 +9,7 @@ use App\Entity\Subject;
 use App\Requests\ScheduleController\AddScheduleItemRequest;
 use App\Requests\ScheduleController\PatchScheduleItemRequest;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,11 +49,14 @@ class ScheduleController extends AbstractController
         $scheduleItem->setSubject($subject);
         $scheduleItem->setStartTime(new DateTime($data['startTime']));
         $scheduleItem->setEndTime(new DateTime($data['endTime']));
+        $scheduleItem->setCreatedAt(new DateTimeImmutable());
 
         $this->entityManager->persist($scheduleItem);
         $this->entityManager->flush();
 
-        return $this->json($scheduleItem, Response::HTTP_CREATED);
+        return $this->json($scheduleItem, Response::HTTP_CREATED, [], [
+            'circular_reference_handler' => fn ($object) => $object->getId(),
+        ]);
     }
 
     /**
