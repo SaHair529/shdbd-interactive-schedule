@@ -60,7 +60,7 @@ class ScheduleController extends AbstractController
     /**
      * @throws Exception
      */
-    #[Route('/schedule/{id}', methods: ['PUT'])]
+    #[Route('/schedule/{id<\d+>}', methods: ['PUT'])]
     public function updateScheduleItem(int $id, AddScheduleItemRequest $request): JsonResponse
     {
         $data = json_decode($request->getRequest()->getContent(), true) ?? [];
@@ -87,7 +87,7 @@ class ScheduleController extends AbstractController
     /**
      * @throws Exception
      */
-    #[Route('/schedule/{id}', methods: ['PATCH'])]
+    #[Route('/schedule/{id<\d+>}', methods: ['PATCH'])]
     public function patchScheduleItem(int $id, PatchScheduleItemRequest $request): JsonResponse
     {
         $data = json_decode($request->getRequest()->getContent(), true) ?? [];
@@ -95,8 +95,6 @@ class ScheduleController extends AbstractController
         $scheduleItemForUpdate = $this->entityManager->getRepository(ScheduleItem::class)->find($id);
         if (!$scheduleItemForUpdate)
             return $this->json(['error' => 'Schedule item not found'], Response::HTTP_NOT_FOUND);
-
-        $scheduleItemForUpdate = new ScheduleItem();
 
         if (isset($data['subjectId'])) {
             $subject = $this->entityManager->getRepository(Subject::class)->find($data['subjectId']);
@@ -108,10 +106,10 @@ class ScheduleController extends AbstractController
             $scheduleItemForUpdate->setDayOfWeek($data['dayOfWeek']);
 
         if (isset($data['startTime']))
-            $scheduleItemForUpdate->setDayOfWeek($data['startTime']);
+            $scheduleItemForUpdate->setStartTime(new DateTime($data['startTime']));
 
         if (isset($data['endTime']))
-            $scheduleItemForUpdate->setDayOfWeek($data['endTime']);
+            $scheduleItemForUpdate->setEndTime(new DateTime($data['endTime']));
 
         $this->entityManager->persist($scheduleItemForUpdate);
         $this->entityManager->flush();
@@ -119,7 +117,7 @@ class ScheduleController extends AbstractController
         return $this->json($scheduleItemForUpdate, Response::HTTP_OK, [], ['groups' => ['schedule_item']]);
     }
 
-    #[Route('/schedule/{id}', methods: ['DELETE'])]
+    #[Route('/schedule/{id<\d+>}', methods: ['DELETE'])]
     public function deleteScheduleItem(int $id): JsonResponse
     {
         $scheduleItemForDelete = $this->entityManager->getRepository(ScheduleItem::class)->find($id);
