@@ -29,7 +29,7 @@ class ScheduleController extends AbstractController
     {
         $scheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->findAll();
 
-        return $this->json($scheduleItems);
+        return $this->json($scheduleItems, Response::HTTP_OK, [], ['groups' => ['schedule_item']]);
     }
 
     /**
@@ -54,9 +54,7 @@ class ScheduleController extends AbstractController
         $this->entityManager->persist($scheduleItem);
         $this->entityManager->flush();
 
-        return $this->json($scheduleItem, Response::HTTP_CREATED, [], [
-            'circular_reference_handler' => fn ($object) => $object->getId(),
-        ]);
+        return $this->json($scheduleItem, Response::HTTP_CREATED, [], ['groups' => ['schedule_item']]);
     }
 
     /**
@@ -118,7 +116,7 @@ class ScheduleController extends AbstractController
         $this->entityManager->persist($scheduleItemForUpdate);
         $this->entityManager->flush();
 
-        return $this->json($scheduleItemForUpdate, Response::HTTP_OK);
+        return $this->json($scheduleItemForUpdate, Response::HTTP_OK, [], ['groups' => ['schedule_item']]);
     }
 
     #[Route('/schedule/{id}', methods: ['DELETE'])]

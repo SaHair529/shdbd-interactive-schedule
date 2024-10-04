@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ScheduleItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ScheduleItemRepository::class)]
@@ -13,6 +14,7 @@ class ScheduleItem
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('schedule_item')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleItems')]
@@ -21,15 +23,19 @@ class ScheduleItem
 
     #[ORM\Column]
     #[Assert\Range(min: 1, max: 7)]
+    #[Groups('schedule_item')]
     private ?int $dayOfWeek = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Groups('schedule_item')]
     private ?\DateTimeInterface $startTime = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[Groups('schedule_item')]
     private ?\DateTimeInterface $endTime = null;
 
     #[ORM\Column(options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[Groups('schedule_item')]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
