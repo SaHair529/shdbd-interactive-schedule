@@ -27,7 +27,10 @@ class ScheduleController extends AbstractController
     #[Route('/schedule', methods: ['GET'])]
     public function getSchedule(): JsonResponse
     {
-        $scheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->findAll();
+        $scheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->findBy([], [
+            'dayOfWeek' => 'ASC',
+            'startTime' => 'ASC',
+        ]);
 
         return $this->json($scheduleItems, Response::HTTP_OK, [], ['groups' => ['schedule_item']]);
     }
