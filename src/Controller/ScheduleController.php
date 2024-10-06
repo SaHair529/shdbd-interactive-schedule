@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Schedule;
 use App\Entity\ScheduleItem;
 use App\Entity\Subject;
 use App\Requests\ScheduleController\AddScheduleItemRequest;
 use App\Requests\ScheduleController\PatchScheduleItemRequest;
+use App\Requests\ScheduleController\UpdateScheduleItemRequest;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,9 +45,13 @@ class ScheduleController extends AbstractController
     {
         $data = json_decode($request->getRequest()->getContent(), true) ?? [];
 
+        $schedule = $this->entityManager->getRepository(Schedule::class)->find($data['scheduleId']);
+        if (!$schedule)
+            return $this->json(['error' => 'Schedule not found'], Response::HTTP_BAD_REQUEST);
+
         $subject = $this->entityManager->getRepository(Subject::class)->find($data['subjectId']);
         if (!$subject)
-            return $this->json(['error' => 'Subject not found'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Subject not found'], Response::HTTP_BAD_REQUEST);
 
         // Проверка на пересечение расписания
         $existingScheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->createQueryBuilder('s')
@@ -72,6 +78,7 @@ class ScheduleController extends AbstractController
         $scheduleItem->setStartTime($startTimeDT);
         $scheduleItem->setEndTime($endTimeDT);
         $scheduleItem->setCreatedAt(new DateTimeImmutable());
+        $scheduleItem->setSchedule($schedule);
 
         $this->entityManager->persist($scheduleItem);
         $this->entityManager->flush();
@@ -83,7 +90,7 @@ class ScheduleController extends AbstractController
      * @throws Exception
      */
     #[Route('/schedule/{id<\d+>}', methods: ['PUT'])]
-    public function updateScheduleItem(int $id, AddScheduleItemRequest $request): JsonResponse
+    public function updateScheduleItem(int $id, UpdateScheduleItemRequest $request): JsonResponse
     {
         $data = json_decode($request->getRequest()->getContent(), true) ?? [];
 
