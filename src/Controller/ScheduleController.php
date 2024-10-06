@@ -107,8 +107,10 @@ class ScheduleController extends AbstractController
 
         // Проверка на пересечение расписания
         $existingScheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->createQueryBuilder('s')
-            ->where('s.dayOfWeek = :dayOfWeek')
+            ->where('s.id <> :id')
+            ->andWhere('s.dayOfWeek = :dayOfWeek')
             ->andWhere('(:startTime BETWEEN s.startTime AND s.endTime OR :endTime BETWEEN s.startTime AND s.endTime OR (s.startTime = :startTime OR s.endTime = :endTime))')
+            ->setParameter('id', $id)
             ->setParameter('dayOfWeek', $data['dayOfWeek'])
             ->setParameter('startTime', $data['startTime'])
             ->setParameter('endTime', $data['endTime'])
@@ -154,8 +156,10 @@ class ScheduleController extends AbstractController
         if (isset($data['startTime']) && isset($data['endTime']) && isset($data['dayOfWeek'])) {
             // Проверка на пересечение расписания
             $existingScheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->createQueryBuilder('s')
-                ->where('s.dayOfWeek = :dayOfWeek')
+                ->where('s.id <> :id')
+                ->andWhere('s.dayOfWeek = :dayOfWeek')
                 ->andWhere('(:startTime BETWEEN s.startTime AND s.endTime OR :endTime BETWEEN s.startTime AND s.endTime OR (s.startTime = :startTime OR s.endTime = :endTime))')
+                ->setParameter('id', $id)
                 ->setParameter('dayOfWeek', $data['dayOfWeek'])
                 ->setParameter('startTime', $data['startTime'])
                 ->setParameter('endTime', $data['endTime'])
