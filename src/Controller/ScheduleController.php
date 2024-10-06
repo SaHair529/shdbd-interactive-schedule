@@ -27,15 +27,12 @@ class ScheduleController extends AbstractController
     {
     }
 
-    #[Route('/schedule', methods: ['GET'])]
-    public function getSchedule(): JsonResponse
+    #[Route('/schedule/{id<\d+>}', methods: ['GET'])]
+    public function getSchedule(int $id): JsonResponse
     {
-        $scheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->findBy([], [
-            'dayOfWeek' => 'ASC',
-            'startTime' => 'ASC',
-        ]);
+        $schedule = $this->entityManager->getRepository(Schedule::class)->findScheduleWithSortedItems($id);
 
-        return $this->json($scheduleItems, Response::HTTP_OK, [], ['groups' => ['schedule_item']]);
+        return $this->json($schedule, Response::HTTP_OK, [], ['groups' => ['schedule_with_items']]);
     }
 
     /**

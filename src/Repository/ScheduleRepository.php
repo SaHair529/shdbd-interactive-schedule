@@ -16,6 +16,21 @@ class ScheduleRepository extends ServiceEntityRepository
         parent::__construct($registry, Schedule::class);
     }
 
+    /**
+     * Запрос Schedule вместе с scheduleItems, отсортированными по startTime
+     */
+    public function findScheduleWithSortedItems(int $id): ?Schedule
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.scheduleItems', 'si')
+            ->addSelect('si')
+            ->where('s.id = :id')
+            ->setParameter('id', $id)
+            ->orderBy('si.startTime', 'ASC')
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Schedule[] Returns an array of Schedule objects
     //     */
