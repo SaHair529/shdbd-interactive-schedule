@@ -14,24 +14,25 @@ class ScheduleItem
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('schedule_item')]
+    #[Groups(['schedule_item', 'schedule_with_items'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleItems')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['schedule_item', 'schedule_with_items'])]
     private ?Subject $subject = null;
 
     #[ORM\Column]
     #[Assert\Range(min: 1, max: 7)]
-    #[Groups('schedule_item')]
+    #[Groups(['schedule_item', 'schedule_with_items'])]
     private ?int $dayOfWeek = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups('schedule_item')]
+    #[Groups(['schedule_item', 'schedule_with_items'])]
     private ?\DateTimeInterface $startTime = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups('schedule_item')]
+    #[Groups(['schedule_item', 'schedule_with_items'])]
     private ?\DateTimeInterface $endTime = null;
 
     #[ORM\Column(options: ['default' => 'CURRENT_TIMESTAMP'])]
