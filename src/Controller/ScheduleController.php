@@ -8,6 +8,7 @@ use App\Entity\Schedule;
 use App\Entity\ScheduleItem;
 use App\Entity\Subject;
 use App\Requests\ScheduleController\AddScheduleItemRequest;
+use App\Requests\ScheduleController\CreateScheduleRequest;
 use App\Requests\ScheduleController\PatchScheduleItemRequest;
 use App\Requests\ScheduleController\UpdateScheduleItemRequest;
 use DateTime;
@@ -200,5 +201,23 @@ class ScheduleController extends AbstractController
         $this->entityManager->flush();
 
         return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/schedule/create', methods: ['POST'])]
+    public function createSchedule(CreateScheduleRequest $request): JsonResponse
+    {
+        $data = json_decode($request->getRequest()->getContent(), true) ?? [];
+
+        $existingSchedule = $this->entityManager->getRepository(Schedule::class)->findOneBy(['title' => $data['title']]);
+        if ($existingSchedule)
+            return $this->json(['error' => 'Schedule already exists'], Response::HTTP_CONFLICT);
+
+        $schedule = new Schedule();
+        $schedule->setTitle($data['title']);
+
+        $this->entityManager->persist($schedule);
+        $this->entityManager->flush();
+
+        return $this->json([$schedule], Response::HTTP_CREATED);
     }
 }
