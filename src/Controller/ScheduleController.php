@@ -52,14 +52,9 @@ class ScheduleController extends AbstractController
             return $this->json(['error' => 'Subject not found'], Response::HTTP_BAD_REQUEST);
 
         // Проверка на пересечение расписания
-        $existingScheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->createQueryBuilder('s')
-            ->where('s.dayOfWeek = :dayOfWeek')
-            ->andWhere('(:startTime BETWEEN s.startTime AND s.endTime OR :endTime BETWEEN s.startTime AND s.endTime OR (s.startTime = :startTime OR s.endTime = :endTime))')
-            ->setParameter('dayOfWeek', $data['dayOfWeek'])
-            ->setParameter('startTime', $data['startTime'])
-            ->setParameter('endTime', $data['endTime'])
-            ->getQuery()
-            ->getResult();
+        $existingScheduleItems = $this->entityManager
+            ->getRepository(ScheduleItem::class)
+            ->findOverlappingItems($schedule->getId(), $data['dayOfWeek'], new DateTime($data['startTime']), new DateTime($data['endTime']));
 
         if (!empty($existingScheduleItems))
             return $this->json(['error' => 'Time slot is already taken'], Response::HTTP_CONFLICT);
@@ -106,16 +101,9 @@ class ScheduleController extends AbstractController
             return $this->json(['error' => 'Subject not found'], Response::HTTP_NOT_FOUND);
 
         // Проверка на пересечение расписания
-        $existingScheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->createQueryBuilder('s')
-            ->where('s.id <> :id')
-            ->andWhere('s.dayOfWeek = :dayOfWeek')
-            ->andWhere('(:startTime BETWEEN s.startTime AND s.endTime OR :endTime BETWEEN s.startTime AND s.endTime OR (s.startTime = :startTime OR s.endTime = :endTime))')
-            ->setParameter('id', $id)
-            ->setParameter('dayOfWeek', $data['dayOfWeek'])
-            ->setParameter('startTime', $data['startTime'])
-            ->setParameter('endTime', $data['endTime'])
-            ->getQuery()
-            ->getResult();
+        $existingScheduleItems = $this->entityManager
+            ->getRepository(ScheduleItem::class)
+            ->findOverlappingItems($scheduleItemForUpdate->getSchedule()->getId(), $data['dayOfWeek'], new DateTime($data['startTime']), new DateTime($data['endTime']), $id);
 
         if (!empty($existingScheduleItems))
             return $this->json(['error' => 'Time slot is already taken'], Response::HTTP_CONFLICT);
@@ -155,16 +143,9 @@ class ScheduleController extends AbstractController
 
         if (isset($data['startTime']) && isset($data['endTime']) && isset($data['dayOfWeek'])) {
             // Проверка на пересечение расписания
-            $existingScheduleItems = $this->entityManager->getRepository(ScheduleItem::class)->createQueryBuilder('s')
-                ->where('s.id <> :id')
-                ->andWhere('s.dayOfWeek = :dayOfWeek')
-                ->andWhere('(:startTime BETWEEN s.startTime AND s.endTime OR :endTime BETWEEN s.startTime AND s.endTime OR (s.startTime = :startTime OR s.endTime = :endTime))')
-                ->setParameter('id', $id)
-                ->setParameter('dayOfWeek', $data['dayOfWeek'])
-                ->setParameter('startTime', $data['startTime'])
-                ->setParameter('endTime', $data['endTime'])
-                ->getQuery()
-                ->getResult();
+            $existingScheduleItems = $this->entityManager
+                ->getRepository(ScheduleItem::class)
+                ->findOverlappingItems($scheduleItemForUpdate->getSchedule()->getId(), $data['dayOfWeek'], new DateTime($data['startTime']), new DateTime($data['endTime']), $id);
 
             if (!empty($existingScheduleItems))
                 return $this->json(['error' => 'Time slot is already taken'], Response::HTTP_CONFLICT);
