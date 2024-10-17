@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -31,6 +33,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, AccessToken>
+     */
+    #[ORM\OneToMany(targetEntity: AccessToken::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $accessTokens;
+
+    public function __construct()
+    {
+        $this->accessTokens = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,5 +118,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, AccessToken>
+     */
+    public function getAccessTokens(): Collection
+    {
+        return $this->accessTokens;
+    }
+
+    public function addAccessToken(AccessToken $accessToken): static
+    {
+        if (!$this->accessTokens->contains($accessToken)) {
+            $this->accessTokens->add($accessToken);
+            $accessToken->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAccessToken(AccessToken $accessToken): static
+    {
+        if ($this->accessTokens->removeElement($accessToken)) {
+            // set the owning side to null (unless already changed)
+            if ($accessToken->getOwner() === $this) {
+                $accessToken->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }
