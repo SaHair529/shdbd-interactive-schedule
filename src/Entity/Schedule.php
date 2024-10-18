@@ -28,9 +28,16 @@ class Schedule
     #[Groups('schedule_with_items')]
     private Collection $scheduleItems;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'schedules')]
+    private Collection $musers;
+
     public function __construct()
     {
         $this->scheduleItems = new ArrayCollection();
+        $this->musers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,6 +83,30 @@ class Schedule
                 $scheduleItem->setSchedule(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getMusers(): Collection
+    {
+        return $this->musers;
+    }
+
+    public function addMuser(User $muser): static
+    {
+        if (!$this->musers->contains($muser)) {
+            $this->musers->add($muser);
+        }
+
+        return $this;
+    }
+
+    public function removeMuser(User $muser): static
+    {
+        $this->musers->removeElement($muser);
 
         return $this;
     }

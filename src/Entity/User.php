@@ -40,9 +40,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: AccessToken::class, mappedBy: 'owner', orphanRemoval: true)]
     private Collection $accessTokens;
 
+    /**
+     * @var Collection<int, Schedule>
+     */
+    #[ORM\ManyToMany(targetEntity: Schedule::class, mappedBy: 'musers')]
+    private Collection $schedules;
+
     public function __construct()
     {
         $this->accessTokens = new ArrayCollection();
+        $this->schedules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +152,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($accessToken->getOwner() === $this) {
                 $accessToken->setOwner(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Schedule>
+     */
+    public function getSchedules(): Collection
+    {
+        return $this->schedules;
+    }
+
+    public function addSchedule(Schedule $schedule): static
+    {
+        if (!$this->schedules->contains($schedule)) {
+            $this->schedules->add($schedule);
+            $schedule->addMuser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSchedule(Schedule $schedule): static
+    {
+        if ($this->schedules->removeElement($schedule)) {
+            $schedule->removeMuser($this);
         }
 
         return $this;
