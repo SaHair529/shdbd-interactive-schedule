@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Schedule;
 use App\Entity\ScheduleItem;
 use App\Entity\Subject;
+use App\Entity\User;
 use App\Requests\ScheduleController\AddScheduleItemRequest;
 use App\Requests\ScheduleController\CreateScheduleRequest;
 use App\Requests\ScheduleController\PatchScheduleItemRequest;
@@ -19,12 +20,43 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[Route('/api')]
 class ScheduleController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
+    private User $user;
+
+    public function __construct(private readonly EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage)
     {
+        $this->user = $tokenStorage->getToken()->getUser();
+    }
+
+    #[Route('/user_schedules', methods: ['GET'])]
+    public function getUserSchedules(): JsonResponse
+    {
+        $userSchedules = $this->user->getSchedules();
+        return $this->json($userSchedules, Response::HTTP_OK);
+    }
+
+    #[Route('/schedule/link/{scheduleId<\d+>}/{userId<\d+>}', methods: ['POST'])]
+    public function linkScheduleWithUser(int $scheduleId, int $userId): JsonResponse
+    {
+        $schedule = $this->entityManager->getRepository(Schedule::class)->find($scheduleId);
+        if (!$schedule)
+            return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
+
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+        if (!$user)
+            return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+
+        $user->addSchedule($schedule);
+        $user->getSchedules()->add($schedule);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => 'Schedule linked successfully'], Response::HTTP_OK);
     }
 
     #[Route('/schedule/{id<\d+>}', methods: ['GET'])]
