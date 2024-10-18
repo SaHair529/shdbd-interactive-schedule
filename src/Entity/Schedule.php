@@ -14,11 +14,11 @@ class Schedule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('schedule_with_items')]
+    #[Groups(['schedule_with_items', 'user_schedule'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups('schedule_with_items')]
+    #[Groups(['schedule_with_items', 'user_schedule'])]
     private ?string $title = null;
 
     /**

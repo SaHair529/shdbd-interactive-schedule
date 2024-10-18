@@ -36,7 +36,7 @@ class ScheduleController extends AbstractController
     public function getUserSchedules(): JsonResponse
     {
         $userSchedules = $this->user->getSchedules();
-        return $this->json($userSchedules, Response::HTTP_OK);
+        return $this->json($userSchedules, Response::HTTP_OK, [], ['groups' => ['user_schedule']]);
     }
 
     #[Route('/schedule/link/{scheduleId<\d+>}/{userId<\d+>}', methods: ['POST'])]
