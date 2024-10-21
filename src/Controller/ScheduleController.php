@@ -64,6 +64,9 @@ class ScheduleController extends AbstractController
     {
         $schedule = $this->entityManager->getRepository(Schedule::class)->findScheduleWithSortedItems($id);
 
+        if (!$schedule)
+            return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
+
         return $this->json($schedule, Response::HTTP_OK, [], ['groups' => ['schedule_with_items']]);
     }
 
