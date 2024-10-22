@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\EventType;
 use App\Repository\ScheduleEventRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -25,7 +26,7 @@ class ScheduleEvent
     private ?string $reason = null;
 
     #[ORM\Column]
-    private ?int $type = null;
+    private ?EventType $type = null;
 
     public function getId(): ?int
     {
@@ -68,12 +69,12 @@ class ScheduleEvent
         return $this;
     }
 
-    public function getType(): ?int
+    public function getType(): ?EventType
     {
         return $this->type;
     }
 
-    public function setType(int $type): static
+    public function setType(EventType $type): static
     {
         $this->type = $type;
 
