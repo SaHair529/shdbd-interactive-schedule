@@ -46,10 +46,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Schedule::class, mappedBy: 'musers')]
     private Collection $schedules;
 
+    /**
+     * @var Collection<int, ScheduleEvent>
+     */
+    #[ORM\OneToMany(targetEntity: ScheduleEvent::class, mappedBy: 'student', orphanRemoval: true)]
+    private Collection $scheduleEvents;
+
     public function __construct()
     {
         $this->accessTokens = new ArrayCollection();
         $this->schedules = new ArrayCollection();
+        $this->scheduleEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -179,6 +186,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->schedules->removeElement($schedule)) {
             $schedule->removeMuser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScheduleEvent>
+     */
+    public function getScheduleEvents(): Collection
+    {
+        return $this->scheduleEvents;
+    }
+
+    public function addScheduleEvent(ScheduleEvent $scheduleEvent): static
+    {
+        if (!$this->scheduleEvents->contains($scheduleEvent)) {
+            $this->scheduleEvents->add($scheduleEvent);
+            $scheduleEvent->setStudent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScheduleEvent(ScheduleEvent $scheduleEvent): static
+    {
+        if ($this->scheduleEvents->removeElement($scheduleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($scheduleEvent->getStudent() === $this) {
+                $scheduleEvent->setStudent(null);
+            }
         }
 
         return $this;

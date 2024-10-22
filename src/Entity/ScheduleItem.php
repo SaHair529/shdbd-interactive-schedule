@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ScheduleItemRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -45,6 +47,17 @@ class ScheduleItem
     #[ORM\ManyToOne(inversedBy: 'scheduleItems')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Schedule $schedule = null;
+
+    /**
+     * @var Collection<int, ScheduleEvent>
+     */
+    #[ORM\OneToMany(targetEntity: ScheduleEvent::class, mappedBy: 'scheduleItem', orphanRemoval: true)]
+    private Collection $scheduleEvents;
+
+    public function __construct()
+    {
+        $this->scheduleEvents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -131,6 +144,36 @@ class ScheduleItem
     public function setSchedule(?Schedule $schedule): static
     {
         $this->schedule = $schedule;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScheduleEvent>
+     */
+    public function getScheduleEvents(): Collection
+    {
+        return $this->scheduleEvents;
+    }
+
+    public function addScheduleEvent(ScheduleEvent $scheduleEvent): static
+    {
+        if (!$this->scheduleEvents->contains($scheduleEvent)) {
+            $this->scheduleEvents->add($scheduleEvent);
+            $scheduleEvent->setScheduleItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScheduleEvent(ScheduleEvent $scheduleEvent): static
+    {
+        if ($this->scheduleEvents->removeElement($scheduleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($scheduleEvent->getScheduleItem() === $this) {
+                $scheduleEvent->setScheduleItem(null);
+            }
+        }
 
         return $this;
     }
