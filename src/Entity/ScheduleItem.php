@@ -16,7 +16,7 @@ class ScheduleItem
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['schedule_item', 'schedule_with_items'])]
+    #[Groups(['schedule_item', 'schedule_with_items', 'schedule_event'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleItems')]

@@ -5,6 +5,7 @@ namespace App\Requests;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -35,7 +36,7 @@ abstract class BaseRequest
         }
 
         if (count($messages['errors']) > 0) {
-            $response = new JsonResponse($messages, 201);
+            $response = new JsonResponse($messages, Response::HTTP_BAD_REQUEST);
             $response->send();
 
             exit;

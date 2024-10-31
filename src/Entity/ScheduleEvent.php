@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\EventType;
 use App\Repository\ScheduleEventRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ScheduleEventRepository::class)]
 class ScheduleEvent
@@ -12,14 +13,17 @@ class ScheduleEvent
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['schedule_event'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleEvents')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['schedule_event'])]
     private ?User $student = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleEvents')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['schedule_event'])]
     private ?ScheduleItem $scheduleItem = null;
 
     #[ORM\Column(length: 255, nullable: true)]
