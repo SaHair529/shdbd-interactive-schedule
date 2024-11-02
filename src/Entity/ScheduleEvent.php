@@ -30,6 +30,7 @@ class ScheduleEvent
     private ?string $reason = null;
 
     #[ORM\Column]
+    #[Groups(['schedule_event'])]
     private ?EventType $type = null;
 
     public function getId(): ?int

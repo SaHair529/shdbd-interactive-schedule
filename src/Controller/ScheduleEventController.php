@@ -12,6 +12,7 @@ use App\Requests\ScheduleEventController\NewRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -20,13 +21,13 @@ class ScheduleEventController extends AbstractController
 {
     private User $user;
 
-    public function __construct(private EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage)
+    public function __construct(private readonly EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage)
     {
         $this->user = $tokenStorage->getToken()->getUser();
     }
 
     #[Route('/schedule/event', name: 'schedule_event_new', methods: ['POST'])]
-    public function new(NewRequest $request): Response
+    public function new(NewRequest $request): JsonResponse
     {
         $data = json_decode($request->getRequest()->getContent(), true);
 
@@ -43,5 +44,16 @@ class ScheduleEventController extends AbstractController
         $this->entityManager->flush();
 
         return $this->json($event, Response::HTTP_CREATED, [], ['groups' => ['schedule_event']]);
+    }
+
+    #[Route('/schedule/event/list/{scheduleItemId<\d+>}', methods: ['GET'])]
+    public function list(int $scheduleItemId): JsonResponse
+    {
+        $scheduleItem = $this->entityManager->getRepository(ScheduleItem::class)->find($scheduleItemId);
+        if (!$scheduleItem) {
+            return $this->json(['error' => 'Schedule item not found'], Response::HTTP_NOT_FOUND);
+        }
+
+	    return $this->json($scheduleItem->getScheduleEvents(), Response::HTTP_OK, [], ['groups' => ['schedule_event']]);
     }
 }
