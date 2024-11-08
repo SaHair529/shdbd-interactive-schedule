@@ -56,4 +56,17 @@ class ScheduleEventController extends AbstractController
 
 	    return $this->json($scheduleItem->getScheduleEvents(), Response::HTTP_OK, [], ['groups' => ['schedule_event']]);
     }
+
+    #[Route('/schedule/event/{eventId<\d+>}', methods: ['DELETE'])]
+    public function delete(int $eventId): JsonResponse
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(ScheduleEvent::class, 'e')
+            ->where('e.id = :eventId')
+            ->setParameter('eventId', $eventId)
+            ->getQuery()
+            ->execute();
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
 }

@@ -17,7 +17,7 @@ class ScheduleItemExistValidator extends ConstraintValidator
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof ScheduleItemExist) {
-            throw new UnexpectedTypeException($constraint, ScheduleEventType::class);
+            throw new UnexpectedTypeException($constraint, ScheduleItemExist::class);
         }
 
         if (null === $value || '' === $value) {
