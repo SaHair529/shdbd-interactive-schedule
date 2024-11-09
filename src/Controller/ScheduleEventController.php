@@ -34,6 +34,19 @@ class ScheduleEventController extends AbstractController
         $scheduleItem = $this->entityManager->getRepository(ScheduleItem::class)->find($data['scheduleItemId']);
         $eventType = EventType::from($data['type']);
 
+        // Проверка есть ли уже такое событие у этого студента, если тип события ABSENCE (1)
+        $existingAbsenceEvents = array_filter(
+            $scheduleItem->getScheduleEvents()->toArray(),
+            function ($event) use ($eventType) {
+                return $eventType === EventType::ABSENCE &&
+                    $eventType === $event->getType() &&
+                    $event->getStudent() === $this->user;
+            }
+        );
+        if (!empty($existingAbsenceEvents)) {
+            return $this->json(['message' => 'Absence event already exists for this user'], Response::HTTP_BAD_REQUEST);
+        }
+
         $event = new ScheduleEvent();
         $event->setStudent($this->user);
         $event->setScheduleItem($scheduleItem);
