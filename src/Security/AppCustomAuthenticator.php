@@ -55,7 +55,7 @@ class AppCustomAuthenticator extends AbstractAuthenticator
         $usernamePasswordToken = new UsernamePasswordToken($user, $firewallName, $user->getRoles());
         $this->tokenStorage->setToken($usernamePasswordToken);
 
-        return new JsonResponse(['status' => 'success', 'accessToken' => $tokenValue], Response::HTTP_OK);
+        return new JsonResponse(['status' => 'success', 'accessToken' => $tokenValue, 'userId' => $user->getId()], Response::HTTP_OK);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
