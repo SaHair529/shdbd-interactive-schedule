@@ -26,7 +26,7 @@ class ScheduleEvent
     #[Groups(['schedule_event'])]
     private ?ScheduleItem $scheduleItem = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['schedule_event'])]
     private ?string $reason = null;
 
