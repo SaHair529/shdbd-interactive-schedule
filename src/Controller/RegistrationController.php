@@ -25,8 +25,8 @@ class RegistrationController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         // Проверяем, что email и password переданы
-        if (!isset($data['email']) || !isset($data['password'])) {
-            return new JsonResponse(['status' => 'error', 'message' => 'Email and password are required'], Response::HTTP_BAD_REQUEST);
+        if (!isset($data['email'], $data['password'], $data['fullName'])) {
+            return new JsonResponse(['status' => 'error', 'message' => 'email, password and fullName are required'], Response::HTTP_BAD_REQUEST);
         }
 
         // Проверяем, нет ли уже такого пользователя
@@ -38,6 +38,7 @@ class RegistrationController extends AbstractController
         // Создаём нового пользователя
         $user = new User();
         $user->setEmail($data['email']);
+        $user->setFullName($data['fullName']);
         $user->setRoles(['ROLE_USER']);
 
         // Хешируем пароль

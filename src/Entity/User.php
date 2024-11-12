@@ -55,6 +55,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ScheduleEvent::class, mappedBy: 'student', orphanRemoval: true)]
     private Collection $scheduleEvents;
 
+    #[ORM\Column(length: 255)]
+    private ?string $fullName = null;
+
     public function __construct()
     {
         $this->accessTokens = new ArrayCollection();
@@ -220,6 +223,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $scheduleEvent->setStudent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(string $fullName): static
+    {
+        $this->fullName = $fullName;
 
         return $this;
     }
