@@ -35,7 +35,12 @@ class ScheduleController extends AbstractController
     #[Route('/user_schedules', methods: ['GET'])]
     public function getUserSchedules(): JsonResponse
     {
-        $userSchedules = $this->user->getSchedules();
+        if (in_array('ROLE_ADMIN', $this->user->getRoles())) {
+            $userSchedules = $this->entityManager->getRepository(Schedule::class)->findAll();
+        }
+        else
+            $userSchedules = $this->user->getSchedules();
+
         return $this->json($userSchedules, Response::HTTP_OK, [], ['groups' => ['user_schedule']]);
     }
 
