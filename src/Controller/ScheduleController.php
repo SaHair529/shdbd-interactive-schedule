@@ -72,9 +72,11 @@ class ScheduleController extends AbstractController
         if (!$schedule)
             return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
 
-        $userSchedules = $this->user->getSchedules();
-        if (!$userSchedules->contains($schedule))
-            return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
+        if (!in_array('ROLE_ADMIN', $this->user->getRoles())) {
+            $userSchedules = $this->user->getSchedules();
+            if (!$userSchedules->contains($schedule))
+                return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
+        }
 
         return $this->json($schedule, Response::HTTP_OK, [], ['groups' => ['schedule_with_items']]);
     }
