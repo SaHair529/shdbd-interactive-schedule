@@ -14,11 +14,11 @@ class Subject
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['schedule_with_items'])]
+    #[Groups(['schedule_with_items', 'subject'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['schedule_with_items'])]
+    #[Groups(['schedule_with_items', 'subject'])]
     private ?string $name = null;
 
     /**

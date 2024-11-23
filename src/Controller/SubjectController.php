@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api')]
 class SubjectController extends AbstractController
@@ -19,6 +20,7 @@ class SubjectController extends AbstractController
     {
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/subject', methods: ['POST'])]
     public function addSubject(AddSubjectRequest $request): JsonResponse
     {
@@ -37,5 +39,12 @@ class SubjectController extends AbstractController
         return $this->json($subject, Response::HTTP_CREATED, [], [
             'circular_reference_handler' => fn ($object) => $object->getId(),
         ]);
+    }
+
+    #[Route('/subject/list', methods: ['GET'])]
+    public function list(): JsonResponse
+    {
+        $subjects = $this->entityManager->getRepository(Subject::class)->findAll();
+        return $this->json($subjects, Response::HTTP_OK, [], ['groups' => ['subject']]);
     }
 }

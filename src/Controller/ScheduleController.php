@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api')]
 class ScheduleController extends AbstractController
@@ -44,6 +45,7 @@ class ScheduleController extends AbstractController
         return $this->json($userSchedules, Response::HTTP_OK, [], ['groups' => ['user_schedule']]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/schedule/link/{scheduleId<\d+>}/{userId<\d+>}', methods: ['POST'])]
     public function linkScheduleWithUser(int $scheduleId, int $userId): JsonResponse
     {
@@ -84,6 +86,7 @@ class ScheduleController extends AbstractController
     /**
      * @throws Exception
      */
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/schedule', methods: ['POST'])]
     public function addScheduleItem(AddScheduleItemRequest $request): JsonResponse
     {
@@ -128,6 +131,7 @@ class ScheduleController extends AbstractController
     /**
      * @throws Exception
      */
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/schedule/{id<\d+>}', methods: ['PUT'])]
     public function updateScheduleItem(int $id, UpdateScheduleItemRequest $request): JsonResponse
     {
@@ -168,6 +172,7 @@ class ScheduleController extends AbstractController
     /**
      * @throws Exception
      */
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/schedule/{id<\d+>}', methods: ['PATCH'])]
     public function patchScheduleItem(int $id, PatchScheduleItemRequest $request): JsonResponse
     {
@@ -218,6 +223,7 @@ class ScheduleController extends AbstractController
         return $this->json($scheduleItemForUpdate, Response::HTTP_OK, [], ['groups' => ['schedule_item']]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/schedule/{id<\d+>}', methods: ['DELETE'])]
     public function deleteScheduleItem(int $id): JsonResponse
     {
@@ -231,6 +237,7 @@ class ScheduleController extends AbstractController
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/schedule/create', methods: ['POST'])]
     public function createSchedule(CreateScheduleRequest $request): JsonResponse
     {
