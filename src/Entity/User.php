@@ -18,17 +18,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['schedule_event'])]
+    #[Groups(['schedule_event', 'user'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['schedule_event'])]
+    #[Groups(['schedule_event', 'user'])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['user'])]
     private array $roles = [];
 
     /**
@@ -56,6 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $scheduleEvents;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['user'])]
     private ?string $fullName = null;
 
     public function __construct()
