@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Requests\UserController\NewRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -17,7 +19,7 @@ class UserController extends AbstractController
 {
     private User $user;
 
-    public function __construct(private readonly EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage)
+    public function __construct(private readonly EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage, private UserPasswordHasherInterface $passwordHasher)
     {
         $this->user = $tokenStorage->getToken()->getUser();
     }
@@ -49,5 +51,30 @@ class UserController extends AbstractController
                 'total_pages' => $totalPages,
             ]
         ], Response::HTTP_OK, [], ['groups' => ['user']]);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/', methods: ['POST'])]
+    public function new(NewRequest $request): JsonResponse
+    {
+        $requestData = json_decode($request->getRequest()->getContent(), true);
+
+        $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $requestData['email']]);
+        if ($existingUser !== null) {
+            return $this->json(['status' => 'error', 'message' => 'User already exists.'], Response::HTTP_CONFLICT);
+        }
+
+        $user = new User();
+        $user->setEmail($requestData['email']);
+        $user->setFullName($requestData['fullName']);
+        $user->setRoles([$requestData['role']]);
+
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $requestData['password']);
+        $user->setPassword($hashedPassword);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $this->json(['status' => 'ok', 'user' => $user], Response::HTTP_CREATED, [], ['groups' => ['user']]);
     }
 }
