@@ -30,15 +30,28 @@ class UserController extends AbstractController
     {
         $page = (int) $request->get('page', 1);
         $limit = (int) $request->get('limit', 25);
+        $searchQuery = $request->get('searchQuery', '');
 
-        $totalUsers = $this->entityManager->getRepository(User::class)->count();
+        $totalUsersQuery = $this->entityManager->getRepository(User::class)->createQueryBuilder('u');
 
-        $users = $this->entityManager->getRepository(User::class)
-            ->createQueryBuilder('u')
-            ->setfirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+        if (!empty($searchQuery)) {
+            $totalUsersQuery->where('u.fullName LIKE :search OR u.email LIKE :search')
+                             ->setParameter('search', '%' . $searchQuery . '%');
+        }
+
+        $totalUsers = $totalUsersQuery->select('COUNT(u.id)')->getQuery()->getSingleScalarResult();
+
+        $usersQuery = $this->entityManager->getRepository(User::class)->createQueryBuilder('u');
+
+        if (!empty($searchQuery)) {
+            $usersQuery->where('u.fullName LIKE :search OR u.email LIKE :search')
+                        ->setParameter('search', '%' . $searchQuery . '%');
+        }
+
+        $users = $usersQuery->setFirstResult(($page - 1) * $limit)
+                             ->setMaxResults($limit)
+                             ->getQuery()
+                             ->getResult();
 
         $totalPages = ceil($totalUsers / $limit);
 
