@@ -41,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, AccessToken>
      */
-    #[ORM\OneToMany(targetEntity: AccessToken::class, mappedBy: 'owner', orphanRemoval: true)]
+#[ORM\OneToMany(targetEntity: AccessToken::class, mappedBy: 'owner', cascade: ['remove'], orphanRemoval: true)]
     private Collection $accessTokens;
 
     /**
