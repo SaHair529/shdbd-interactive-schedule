@@ -34,6 +34,9 @@ class Schedule
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'schedules')]
     private Collection $musers;
 
+    #[ORM\ManyToOne(inversedBy: 'schedule')]
+    private ?Group $groupp = null;
+
     public function __construct()
     {
         $this->scheduleItems = new ArrayCollection();
@@ -107,6 +110,18 @@ class Schedule
     public function removeMuser(User $muser): static
     {
         $this->musers->removeElement($muser);
+
+        return $this;
+    }
+
+    public function getGroupp(): ?Group
+    {
+        return $this->groupp;
+    }
+
+    public function setGroupp(?Group $groupp): static
+    {
+        $this->groupp = $groupp;
 
         return $this;
     }

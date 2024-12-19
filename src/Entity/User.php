@@ -60,6 +60,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user'])]
     private ?string $fullName = null;
 
+    #[ORM\ManyToOne(inversedBy: 'students')]
+    private ?Group $groupp = null;
+
     public function __construct()
     {
         $this->accessTokens = new ArrayCollection();
@@ -237,6 +240,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFullName(string $fullName): static
     {
         $this->fullName = $fullName;
+
+        return $this;
+    }
+
+    public function getGroupp(): ?Group
+    {
+        return $this->groupp;
+    }
+
+    public function setGroupp(?Group $groupp): static
+    {
+        $this->groupp = $groupp;
 
         return $this;
     }
