@@ -6,6 +6,7 @@ use App\Repository\GroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: GroupRepository::class)]
 #[ORM\Table(name: '`group`')]
@@ -14,6 +15,7 @@ class Group
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['group_list'])]
     private ?int $id = null;
 
     /**
@@ -27,6 +29,10 @@ class Group
      */
     #[ORM\OneToMany(targetEntity: Schedule::class, mappedBy: 'groupp')]
     private Collection $schedule;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['group_list'])]
+    private ?string $name = null;
 
     public function __construct()
     {
@@ -95,6 +101,18 @@ class Group
                 $schedule->setGroupp(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }
