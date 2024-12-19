@@ -17,7 +17,7 @@ class ScheduleEvent
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleEvents')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups(['schedule_event'])]
     private ?User $student = null;
 

@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, ScheduleEvent>
      */
-    #[ORM\OneToMany(targetEntity: ScheduleEvent::class, mappedBy: 'student', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ScheduleEvent::class, mappedBy: 'student', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scheduleEvents;
 
     #[ORM\Column(length: 255)]
