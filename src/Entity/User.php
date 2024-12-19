@@ -60,8 +60,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user'])]
     private ?string $fullName = null;
 
-    #[ORM\ManyToOne(inversedBy: 'students')]
-    private ?Group $groupp = null;
+    #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'participant')]
+    private Collection $groups;
 
     public function __construct()
     {
@@ -244,15 +244,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getGroupp(): ?Group
+    /**
+     * @return Collection<int, Group>
+     */
+    public function getGroups(): Collection
     {
-        return $this->groupp;
+        return $this->groups;
     }
 
-    public function setGroupp(?Group $groupp): static
+    public function addGroup(Group $group): static
     {
-        $this->groupp = $groupp;
+        if (!$this->groups->contains($group)) {
+            $this->groups->add($group);
+            $group->addParticipant($this);
+        }
 
         return $this;
+    }
+
+    public function removeGroup(Group $group): static
+    {
+        if ($this->groups->removeElement($group)) {
+            $group->removeParticipant($this);
+        }
     }
 }

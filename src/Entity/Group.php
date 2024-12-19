@@ -19,8 +19,8 @@ class Group
     /**
      * @var Collection<int, User>
      */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'groupp')]
-    private Collection $students;
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'groups')]
+    private Collection $participants;
 
     /**
      * @var Collection<int, Schedule>
@@ -30,7 +30,7 @@ class Group
 
     public function __construct()
     {
-        $this->students = new ArrayCollection();
+        $this->participants = new ArrayCollection();
         $this->schedule = new ArrayCollection();
     }
 
@@ -42,27 +42,27 @@ class Group
     /**
      * @return Collection<int, User>
      */
-    public function getStudents(): Collection
+    public function getParticipants(): Collection
     {
-        return $this->students;
+        return $this->participants;
     }
 
-    public function addStudent(User $student): static
+    public function addParticipant(User $participant): static
     {
-        if (!$this->students->contains($student)) {
-            $this->students->add($student);
-            $student->setGroupp($this);
+        if (!$this->participants->contains($participant)) {
+            $this->participants->add($participant);
+            $participant->addGroup($this);
         }
 
         return $this;
     }
 
-    public function removeStudent(User $student): static
+    public function removeParticipant(User $participant): static
     {
-        if ($this->students->removeElement($student)) {
+        if ($this->participants->removeElement($participant)) {
             // set the owning side to null (unless already changed)
-            if ($student->getGroupp() === $this) {
-                $student->setGroupp(null);
+            if ($participant->getGroups()->contains($this)) {
+                $participant->removeGroup($this);
             }
         }
 
