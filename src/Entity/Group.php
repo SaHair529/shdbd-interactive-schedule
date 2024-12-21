@@ -28,7 +28,7 @@ class Group
      * @var Collection<int, Schedule>
      */
     #[ORM\OneToMany(targetEntity: Schedule::class, mappedBy: 'groupp')]
-    private Collection $schedule;
+    private Collection $schedules;
 
     #[ORM\Column(length: 255)]
     #[Groups(['group_list'])]
@@ -37,7 +37,7 @@ class Group
     public function __construct()
     {
         $this->participants = new ArrayCollection();
-        $this->schedule = new ArrayCollection();
+        $this->schedules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -78,27 +78,27 @@ class Group
     /**
      * @return Collection<int, Schedule>
      */
-    public function getSchedule(): Collection
+    public function getSchedules(): Collection
     {
-        return $this->schedule;
+        return $this->schedules;
     }
 
-    public function addSchedule(Schedule $schedule): static
+    public function addSchedules(Schedule $schedules): static
     {
-        if (!$this->schedule->contains($schedule)) {
-            $this->schedule->add($schedule);
-            $schedule->setGroupp($this);
+        if (!$this->schedules->contains($schedules)) {
+            $this->schedules->add($schedules);
+            $schedules->setGroupp($this);
         }
 
         return $this;
     }
 
-    public function removeSchedule(Schedule $schedule): static
+    public function removeSchedule(Schedule $schedules): static
     {
-        if ($this->schedule->removeElement($schedule)) {
+        if ($this->schedules->removeElement($schedules)) {
             // set the owning side to null (unless already changed)
-            if ($schedule->getGroupp() === $this) {
-                $schedule->setGroupp(null);
+            if ($schedules->getGroupp() === $this) {
+                $schedules->setGroupp(null);
             }
         }
 
