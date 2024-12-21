@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Group;
 use App\Entity\User;
+use App\Requests\UserController\BatchAddGroupRequest;
 use App\Requests\UserController\NewRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -106,5 +108,28 @@ class UserController extends AbstractController
             ->execute();
 
         return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Добавление пользователей в группу
+     */
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/add_group', methods: ['POST'])]
+    public function batchAddGroup(BatchAddGroupRequest $request): JsonResponse
+    {
+        $requestData = json_decode($request->getRequest()->getContent(), true);
+        $filteredUsersIds = array_filter((array) $requestData['usersIds'], fn($value) => is_numeric($value));
+
+        $group = $this->entityManager->getRepository(Group::class)->find($requestData['groupId']);
+        $users = $this->entityManager->getRepository(User::class)->findBy(['id' => $filteredUsersIds]);
+
+        foreach ($users as $user) {
+            $group->addParticipant($user);
+        }
+
+        $this->entityManager->persist($group);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => 'ok'], Response::HTTP_OK);
     }
 }
