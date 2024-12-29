@@ -267,5 +267,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->groups->removeElement($group)) {
             $group->removeParticipant($this);
         }
+
+        return $this;
     }
 }

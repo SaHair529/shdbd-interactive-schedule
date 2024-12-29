@@ -132,4 +132,27 @@ class UserController extends AbstractController
 
         return $this->json(['success' => 'ok'], Response::HTTP_OK);
     }
+
+    /**
+     * Удаление пользователей из группы
+     */
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/remove_group', methods: ['POST'])]
+    public function batchRemoveGroup(BatchAddGroupRequest $request): JsonResponse
+    {
+        $requestData = json_decode($request->getRequest()->getContent(), true);
+        $filteredUsersIds = array_filter((array) $requestData['usersIds'], fn($value) => is_numeric($value));
+
+        $group = $this->entityManager->getRepository(Group::class)->find($requestData['groupId']);
+        $users = $this->entityManager->getRepository(User::class)->findBy(['id' => $filteredUsersIds]);
+
+        foreach($users as $user) {
+            $group->removeParticipant($user);
+        }
+
+        $this->entityManager->persist($group);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => 'ok'], Response::HTTP_OK);
+    }
 }
