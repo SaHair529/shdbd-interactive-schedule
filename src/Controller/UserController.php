@@ -33,6 +33,7 @@ class UserController extends AbstractController
         $page = (int) $request->get('page', 1);
         $limit = (int) $request->get('limit', 25);
         $searchQuery = $request->get('searchQuery', '');
+        $filter = json_decode($request->query->get('filter'), true);
 
         $totalUsersQuery = $this->entityManager->getRepository(User::class)->createQueryBuilder('u');
 
@@ -48,6 +49,12 @@ class UserController extends AbstractController
         if (!empty($searchQuery)) {
             $usersQuery->where('u.fullName LIKE :search OR u.email LIKE :search')
                         ->setParameter('search', '%' . $searchQuery . '%');
+        }
+
+        if (!empty($filter['groups'])) {
+            $usersQuery->innerJoin('u.groups', 'g')
+                        ->andWhere('g.id IN (:groups)')
+                        ->setParameter('groups', $filter['groups']);
         }
 
         $users = $usersQuery->setFirstResult(($page - 1) * $limit)
