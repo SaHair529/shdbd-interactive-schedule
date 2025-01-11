@@ -14,11 +14,11 @@ class Schedule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['schedule_with_items', 'user_schedule'])]
+    #[Groups(['schedule_with_items', 'user_schedule', 'user'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['schedule_with_items', 'user_schedule'])]
+    #[Groups(['schedule_with_items', 'user_schedule', 'user'])]
     private ?string $title = null;
 
     /**
@@ -102,6 +102,7 @@ class Schedule
     {
         if (!$this->musers->contains($muser)) {
             $this->musers->add($muser);
+            $muser->addSchedule($this);
         }
 
         return $this;

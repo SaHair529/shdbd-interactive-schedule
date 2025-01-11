@@ -27,6 +27,18 @@ class UserController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
+    #[Route('/{id<\d+>}', methods: ['GET'])]
+    public function get(int $id): JsonResponse
+    {
+        $user =  $this->entityManager->getRepository(User::class)->find($id);
+        if ($user === null) {
+            return $this->json(['error' => 'not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user']);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {

@@ -58,7 +58,6 @@ class ScheduleController extends AbstractController
             return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
 
         $user->addSchedule($schedule);
-        $user->getSchedules()->add($schedule);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();

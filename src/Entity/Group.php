@@ -15,7 +15,7 @@ class Group
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['group_list'])]
+    #[Groups(['group_list', 'user'])]
     private ?int $id = null;
 
     /**
@@ -31,7 +31,7 @@ class Group
     private Collection $schedules;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['group_list'])]
+    #[Groups(['group_list', 'user'])]
     private ?string $name = null;
 
     public function __construct()

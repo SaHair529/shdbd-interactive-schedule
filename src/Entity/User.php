@@ -18,7 +18,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['schedule_event', 'user_compact'])]
+    #[Groups(['schedule_event', 'user_compact', 'user'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -29,7 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column(type: 'json', options: ['jsonb' => true])]
-    #[Groups(['user_compact'])]
+    #[Groups(['user_compact', 'user'])]
     private array $roles = [];
 
     /**
@@ -48,6 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Schedule>
      */
     #[ORM\ManyToMany(targetEntity: Schedule::class, mappedBy: 'musers')]
+    #[Groups(['user'])]
     private Collection $schedules;
 
     /**
@@ -57,10 +58,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $scheduleEvents;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user_compact'])]
+    #[Groups(['user_compact', 'user'])]
     private ?string $fullName = null;
 
     #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'participant')]
+    #[Groups(['user'])]
     private Collection $groups;
 
     public function __construct()
