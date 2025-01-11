@@ -72,7 +72,7 @@ class UserController extends AbstractController
                 'total_users' => $totalUsers,
                 'total_pages' => $totalPages,
             ]
-        ], Response::HTTP_OK, [], ['groups' => ['users_list']]);
+        ], Response::HTTP_OK, [], ['groups' => ['user_compact']]);
     }
 
     #[IsGranted('ROLE_ADMIN')]
@@ -97,7 +97,7 @@ class UserController extends AbstractController
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return $this->json(['status' => 'ok', 'user' => $user], Response::HTTP_CREATED, [], ['groups' => ['users_list']]);
+        return $this->json(['status' => 'ok', 'user' => $user], Response::HTTP_CREATED, [], ['groups' => ['user_compact']]);
     }
 
     #[IsGranted('ROLE_ADMIN')]
