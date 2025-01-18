@@ -6,6 +6,7 @@ use App\Entity\Group;
 use App\Entity\User;
 use App\Requests\UserController\BatchAddGroupRequest;
 use App\Requests\UserController\NewRequest;
+use App\Requests\UserController\UpdateRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -173,5 +174,40 @@ class UserController extends AbstractController
         $this->entityManager->flush();
 
         return $this->json(['success' => 'ok'], Response::HTTP_OK);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/{id<\d+>}', methods: ['POST'])]
+    public function update(int $id, UpdateRequest $request): JsonResponse
+    {
+        $requestData = json_decode($request->getRequest()->getContent(), true);
+
+        $user = $this->entityManager->getRepository(User::class)->find($id);
+        if (!$user) {
+            return $this->json(['error' => 'user not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $user->setFullName($requestData['fullName'] ?? $user->getFullName());
+        $user->setEmail($requestData['email'] ?? $user->getEmail());
+
+        if (isset($requestData['roles'])){
+            $user->setRoles($requestData['roles']);
+        }
+
+        if (isset($requestData['groups'])) {
+            foreach ($user->getGroups() as $group) {
+                $user->removeGroup($group);
+            }
+
+            $groups = $this->entityManager->getRepository(Group::class)->findBy(['id' => $requestData['groups']]);
+            foreach ($groups as $group) {
+                $user->addGroup($group);
+            }
+        }
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user']);
     }
 }
