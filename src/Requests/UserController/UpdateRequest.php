@@ -9,11 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class UpdateRequest extends BaseRequest
 {
-    #[Assert\NotBlank]
-    #[CustomAssert\EmailAvailable]
     protected string $email;
 
-    #[Assert\NotBlank]
     protected string $fullName;
 
     #[CustomAssert\ValidUserRoles]

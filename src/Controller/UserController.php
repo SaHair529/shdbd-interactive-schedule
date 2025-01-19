@@ -187,6 +187,13 @@ class UserController extends AbstractController
             return $this->json(['error' => 'user not found'], Response::HTTP_NOT_FOUND);
         }
 
+        if (isset($requestData['email'])) {
+            $userByEmail = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $requestData['email']]);
+            if ($userByEmail && $userByEmail->getId() !== $id) {
+                return $this->json(['error' => 'Email is not available']);
+            }
+        }
+
         $user->setFullName($requestData['fullName'] ?? $user->getFullName());
         $user->setEmail($requestData['email'] ?? $user->getEmail());
 
@@ -199,7 +206,7 @@ class UserController extends AbstractController
                 $user->removeGroup($group);
             }
 
-            $groups = $this->entityManager->getRepository(Group::class)->findBy(['id' => $requestData['groups']]);
+            $groups = $this->entityManager->getRepository(Group::class)->findBy(['id' => array_column($requestData['groups'], 'id')]);
             foreach ($groups as $group) {
                 $user->addGroup($group);
             }
