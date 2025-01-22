@@ -24,7 +24,7 @@ class Subject
     /**
      * @var Collection<int, ScheduleItem>
      */
-    #[ORM\OneToMany(targetEntity: ScheduleItem::class, mappedBy: 'subject', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ScheduleItem::class, mappedBy: 'subject', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scheduleItems;
 
     public function __construct()
