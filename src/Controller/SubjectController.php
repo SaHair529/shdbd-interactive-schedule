@@ -9,6 +9,7 @@ use App\Requests\SubjectController\AddSubjectRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -46,5 +47,21 @@ class SubjectController extends AbstractController
     {
         $subjects = $this->entityManager->getRepository(Subject::class)->findAll();
         return $this->json($subjects, Response::HTTP_OK, [], ['groups' => ['subject']]);
+    }
+
+    #[Route('/subject/', methods: ['DELETE'])]
+    public function delete(Request $request): JsonResponse
+    {
+        $requestData = json_decode($request->getContent(), true) ?? [];
+        $ids = $requestData['ids'] ?? [];
+
+        $this->entityManager->createQueryBuilder()
+            ->delete(Subject::class, 's')
+            ->where('s.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }
