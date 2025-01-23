@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -60,6 +61,26 @@ class ScheduleController extends AbstractController
         $user->addSchedule($schedule);
 
         $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => 'Schedule linked successfully'], Response::HTTP_OK);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/schedule/batch_link/{scheduleId<\d+>}', methods: ['POST'])]
+    public function BatchLinkScheduleWithUsers(int $scheduleId, Request $request): JsonResponse
+    {
+        $schedule = $this->entityManager->getRepository(Schedule::class)->find($scheduleId);
+        if (!$schedule)
+            return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
+
+        $usersIds = json_decode($request->getContent(), true)['usersIds'] ?? [];
+
+        $users = $this->entityManager->getRepository(User::class)->findBy(['id' => $usersIds]);
+        foreach ($users as $user) {
+            $user->addSchedule($schedule);
+            $this->entityManager->persist($user);
+        }
         $this->entityManager->flush();
 
         return $this->json(['success' => 'Schedule linked successfully'], Response::HTTP_OK);
