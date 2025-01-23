@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Group;
+use App\Entity\Schedule;
 use App\Entity\User;
 use App\Requests\UserController\BatchAddGroupRequest;
 use App\Requests\UserController\NewRequest;
@@ -209,6 +210,17 @@ class UserController extends AbstractController
             $groups = $this->entityManager->getRepository(Group::class)->findBy(['id' => array_column($requestData['groups'], 'id')]);
             foreach ($groups as $group) {
                 $user->addGroup($group);
+            }
+        }
+
+        if (isset($requestData['schedules'])) {
+            foreach ($user->getSchedules() as $schedule) {
+                $user->removeSchedule($schedule);
+            }
+
+            $schedules = $this->entityManager->getRepository(Schedule::class)->findBy(['id' => array_column($requestData['schedules'], 'id')]);
+            foreach ($schedules as $schedule) {
+                $user->addSchedule($schedule);
             }
         }
 
