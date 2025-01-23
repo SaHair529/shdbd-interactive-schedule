@@ -86,6 +86,26 @@ class ScheduleController extends AbstractController
         return $this->json(['success' => 'Schedule linked successfully'], Response::HTTP_OK);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/schedule/batch_unlink/{scheduleId<\d+>}', methods: ['POST'])]
+    public function BatchUnlinkScheduleWithUsers(int $scheduleId, Request $request): JsonResponse
+    {
+        $schedule = $this->entityManager->getRepository(Schedule::class)->find($scheduleId);
+        if (!$schedule)
+            return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
+
+        $usersIds = json_decode($request->getContent(), true)['usersIds'] ?? [];
+
+        $users = $this->entityManager->getRepository(User::class)->findBy(['id' => $usersIds]);
+        foreach ($users as $user) {
+            $user->removeSchedule($schedule);
+            $this->entityManager->persist($user);
+        }
+        $this->entityManager->flush();
+
+        return $this->json(['success' => 'Schedule linked successfully'], Response::HTTP_OK);
+    }
+
     #[Route('/schedule/{id<\d+>}', methods: ['GET'])]
     public function getSchedule(int $id): JsonResponse
     {
