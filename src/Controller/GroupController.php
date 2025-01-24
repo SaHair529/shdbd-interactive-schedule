@@ -46,4 +46,21 @@ class GroupController extends AbstractController
 
         return $this->json($group, Response::HTTP_CREATED);
     }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/', methods: ['DELETE'])]
+    public function batchDelete(Request $request): JsonResponse
+    {
+        $requestData = json_decode($request->getContent(), true) ?? [];
+        $ids = $requestData['ids'] ?? [];
+
+        $this->entityManager->createQueryBuilder()
+            ->delete(Group::class, 'g')
+            ->where('g.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
 }
