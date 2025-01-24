@@ -264,7 +264,7 @@ class ScheduleController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/schedule/{id<\d+>}', methods: ['DELETE'])]
+    #[Route('/schedule_item/{id<\d+>}', methods: ['DELETE'])]
     public function deleteScheduleItem(int $id): JsonResponse
     {
         $scheduleItemForDelete = $this->entityManager->getRepository(ScheduleItem::class)->find($id);
