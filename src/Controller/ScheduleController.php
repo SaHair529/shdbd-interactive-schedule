@@ -278,6 +278,20 @@ class ScheduleController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
+    #[Route('/schedule/{id<\d+>}', methods: ['DELETE'])]
+    public function deleteSchedule(int $id): JsonResponse
+    {
+        $scheduleForDelete = $this->entityManager->getRepository(Schedule::class)->find($id);
+        if (!$scheduleForDelete)
+            return $this->json(['error' => 'Schedule not found'], Response::HTTP_NOT_FOUND);
+
+        $this->entityManager->remove($scheduleForDelete);
+        $this->entityManager->flush();
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/schedule/create', methods: ['POST'])]
     public function createSchedule(CreateScheduleRequest $request): JsonResponse
     {
