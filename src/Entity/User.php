@@ -58,7 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $scheduleEvents;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user_compact', 'user'])]
+    #[Groups(['user_compact', 'user', 'schedule_event'])]
     private ?string $fullName = null;
 
     #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'participant')]
