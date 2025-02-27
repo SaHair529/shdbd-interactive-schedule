@@ -22,6 +22,6 @@ class TeacherController extends AbstractController
             return in_array(UserRole::ROLE_TEACHER, $user->getRoles());
         });
         
-        return $this->json(['teachers' => $teachers], Response::HTTP_OK, [], ['groups' => ['user_compact']]);
+        return $this->json($teachers, Response::HTTP_OK, [], ['groups' => ['user_compact']]);
     }
 }
