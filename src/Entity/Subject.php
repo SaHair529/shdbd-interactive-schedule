@@ -27,9 +27,16 @@ class Subject
     #[ORM\OneToMany(targetEntity: ScheduleItem::class, mappedBy: 'subject', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scheduleItems;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'subjects')]
+    private Collection $teachers;
+
     public function __construct()
     {
         $this->scheduleItems = new ArrayCollection();
+        $this->teachers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -75,6 +82,30 @@ class Subject
                 $scheduleItem->setSubject(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getTeachers(): Collection
+    {
+        return $this->teachers;
+    }
+
+    public function addTeacher(User $teacher): static
+    {
+        if (!$this->teachers->contains($teacher)) {
+            $this->teachers->add($teacher);
+        }
+
+        return $this;
+    }
+
+    public function removeTeacher(User $teacher): static
+    {
+        $this->teachers->removeElement($teacher);
 
         return $this;
     }

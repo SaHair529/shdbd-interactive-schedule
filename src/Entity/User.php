@@ -65,11 +65,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user'])]
     private Collection $groups;
 
+    /**
+     * @var Collection<int, Subject>
+     */
+    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'teachers')]
+    private Collection $subjects;
+
     public function __construct()
     {
         $this->accessTokens = new ArrayCollection();
         $this->schedules = new ArrayCollection();
         $this->scheduleEvents = new ArrayCollection();
+        $this->subjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -268,6 +275,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->groups->removeElement($group)) {
             $group->removeParticipant($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subject>
+     */
+    public function getSubjects(): Collection
+    {
+        return $this->subjects;
+    }
+
+    public function addSubject(Subject $subject): static
+    {
+        if (!$this->subjects->contains($subject)) {
+            $this->subjects->add($subject);
+            $subject->addTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubject(Subject $subject): static
+    {
+        if ($this->subjects->removeElement($subject)) {
+            $subject->removeTeacher($this);
         }
 
         return $this;
