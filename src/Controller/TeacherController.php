@@ -18,9 +18,9 @@ class TeacherController extends AbstractController
     #[Route('/', methods: ['GET'])]
     public function list()
     {
-        $teachers = array_filter($this->em->getRepository(User::class)->findAll(), function ($user) {
-            return in_array(UserRole::ROLE_TEACHER, $user->getRoles());
-        });
+        $teachers = array_values(array_filter($this->em->getRepository(User::class)->findAll(), function ($user) {
+            return in_array(UserRole::ROLE_TEACHER->value, $user->getRoles());
+        }));
         
         return $this->json($teachers, Response::HTTP_OK, [], ['groups' => ['user_compact']]);
     }
