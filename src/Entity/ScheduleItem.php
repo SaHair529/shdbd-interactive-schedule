@@ -42,7 +42,7 @@ class ScheduleItem
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleItems')]
-    private ?Teacher $teacher = null;
+    private ?User $teacher = null;
 
     #[ORM\ManyToOne(inversedBy: 'scheduleItems')]
     #[ORM\JoinColumn(nullable: false)]
@@ -124,12 +124,12 @@ class ScheduleItem
         return $this;
     }
 
-    public function getTeacher(): ?Teacher
+    public function getTeacher(): ?User
     {
         return $this->teacher;
     }
 
-    public function setTeacher(?Teacher $teacher): static
+    public function setTeacher(?User $teacher): static
     {
         $this->teacher = $teacher;
 

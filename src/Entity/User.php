@@ -66,6 +66,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $groups;
 
     /**
+     * @var Collection<int, ScheduleItem>
+     */
+    #[ORM\OneToMany(targetEntity: ScheduleItem::class, mappedBy: 'teacher')]
+    private Collection $scheduleItems;
+
+    /**
      * @var Collection<int, Subject>
      */
     #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'teachers')]
@@ -77,6 +83,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->schedules = new ArrayCollection();
         $this->scheduleEvents = new ArrayCollection();
         $this->subjects = new ArrayCollection();
+        $this->scheduleItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -302,6 +309,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->subjects->removeElement($subject)) {
             $subject->removeTeacher($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScheduleItem>
+     */
+    public function getScheduleItems(): Collection
+    {
+        return $this->scheduleItems;
+    }
+
+    public function addScheduleItem(ScheduleItem $scheduleItem): static
+    {
+        if (!$this->scheduleItems->contains($scheduleItem)) {
+            $this->scheduleItems->add($scheduleItem);
+            $scheduleItem->setTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScheduleItem(ScheduleItem $scheduleItem): static
+    {
+        if ($this->scheduleItems->removeElement($scheduleItem)) {
+            // set the owning side to null (unless already changed)
+            if ($scheduleItem->getTeacher() === $this) {
+                $scheduleItem->setTeacher(null);
+            }
         }
 
         return $this;
