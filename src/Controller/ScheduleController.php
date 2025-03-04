@@ -140,6 +140,8 @@ class ScheduleController extends AbstractController
         if (!$subject)
             return $this->json(['error' => 'Subject not found'], Response::HTTP_BAD_REQUEST);
 
+        $teacher = $this->entityManager->getRepository(User::class)->find($data['teacherId']);
+
         // Проверка на пересечение расписания
         $existingScheduleItems = $this->entityManager
             ->getRepository(ScheduleItem::class)
@@ -161,6 +163,7 @@ class ScheduleController extends AbstractController
         $scheduleItem->setEndTime($endTimeDT);
         $scheduleItem->setCreatedAt(new DateTimeImmutable());
         $scheduleItem->setSchedule($schedule);
+        $scheduleItem->setTeacher($teacher);
 
         $this->entityManager->persist($scheduleItem);
         $this->entityManager->flush();

@@ -3,6 +3,7 @@
 namespace App\Requests\ScheduleController;
 use App\Requests\BaseRequest;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as CustomAssert;
 
 class AddScheduleItemRequest extends BaseRequest
 {
@@ -27,6 +28,12 @@ class AddScheduleItemRequest extends BaseRequest
     #[Assert\NotBlank]
     #[Assert\Positive]
     protected int $scheduleId;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    #[CustomAssert\TeacherExist]
+    protected int $teacherId;
+    
     protected function autoValidateRequest(): bool
     {
         return true;
