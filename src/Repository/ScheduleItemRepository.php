@@ -43,4 +43,19 @@ class ScheduleItemRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function findTeacherOverlappingItems(int $teacherId, int $dayOfWeek, DateTime $startTime, DateTime $endTime): array
+    {
+        $qb = $this->createQueryBuilder('si')
+            ->where('si.teacher = :teacherId')
+            ->andWhere('si.dayOfWeek = :dayOfWeek')
+            ->andWhere('si.startTime <= :endTime')
+            ->andWhere('si.endTime >= :startTime')
+            ->setParameter('teacherId', $teacherId)
+            ->setParameter('dayOfWeek', $dayOfWeek)
+            ->setParameter('startTime', $startTime)
+            ->setParameter('endTime', $endTime);
+
+        return $qb->getQuery()->getResult();
+    }
 }

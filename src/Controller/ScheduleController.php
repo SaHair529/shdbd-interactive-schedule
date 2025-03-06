@@ -147,9 +147,12 @@ class ScheduleController extends AbstractController
             ->getRepository(ScheduleItem::class)
             ->findOverlappingItems($schedule->getId(), $data['dayOfWeek'], new DateTime($data['startTime']), new DateTime($data['endTime']));
 
-        if (!empty($existingScheduleItems))
-            return $this->json(['error' => 'Time slot is already taken'], Response::HTTP_CONFLICT);
+        // if (!empty($existingScheduleItems))
+        //     return $this->json(['error' => 'Time slot is already taken'], Response::HTTP_CONFLICT);
 
+        $teacherOverlappingItems = $this->entityManager->getRepository(ScheduleItem::class)->findTeacherOverlappingItems($teacher->getId(), $data['dayOfWeek'], new DateTime($data['startTime']), new DateTime($data['endTime']));
+        if (!empty($teacherOverlappingItems))
+            return $this->json(['error' => 'Teacher is not available at this time'], Response::HTTP_CONFLICT);
 
         $startTimeDT = new DateTime($data['startTime']);
         $endTimeDT = new DateTime($data['endTime']);
